@@ -66,6 +66,8 @@ describe OmniAuth::Strategies::LinkedIn do
       expect(subject.info).to have_key :first_name
       expect(subject.info).to have_key :last_name
       expect(subject.info).to have_key :picture_url
+      expect(subject.info).to have_key :country_abbreviation
+      expect(subject.info).to have_key :preferred_language
 
       expect(subject.raw_info).to eq({ :foo => 'bar' })
     end
