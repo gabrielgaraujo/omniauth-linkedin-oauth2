@@ -66,6 +66,8 @@ describe OmniAuth::Strategies::LinkedIn do
       expect(subject.info).to have_key :first_name
       expect(subject.info).to have_key :last_name
       expect(subject.info).to have_key :picture_url
+      expect(subject.info).to have_key :country_abbreviation
+      expect(subject.info).to have_key :preferred_language
 
       expect(subject.raw_info).to eq({ :foo => 'bar' })
     end
@@ -108,5 +110,24 @@ describe OmniAuth::Strategies::LinkedIn do
         expect(subject.authorize_params['scope']).to eq('r_liteprofile r_emailaddress')
       end
     end
+  end
+
+  describe '#localized_field' do
+    let(:raw_info) do 
+      {
+        'foo' => { 
+          'preferredLocale' => { 
+            'language' => 'bar', 
+            'country' => 'BAZ' 
+          }
+        }
+      }
+    end
+
+    before :each do
+      allow(subject).to receive(:raw_info).and_return raw_info
+    end
+
+    specify { expect(subject.send(:field_locale,'foo')).to eq 'bar_BAZ' }
   end
 end

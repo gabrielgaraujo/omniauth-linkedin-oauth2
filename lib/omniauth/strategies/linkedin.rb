@@ -23,7 +23,9 @@ module OmniAuth
           :email => email_address,
           :first_name => localized_field('firstName'),
           :last_name => localized_field('lastName'),
-          :picture_url => picture_url
+          :picture_url => picture_url,
+          :country_abbreviation => country_abbreviation,
+          :preferred_language => preferred_language
         }
       end
 
@@ -92,18 +94,20 @@ module OmniAuth
       end
 
       def localized_field field_name
-        return unless localized_field_available? field_name
-
-        raw_info[field_name]['localized'][field_locale(field_name)]
+        raw_info.dig(*[field_name, 'localized', field_locale(field_name)])
       end
 
       def field_locale field_name
-        "#{ raw_info[field_name]['preferredLocale']['language'] }_" \
-          "#{ raw_info[field_name]['preferredLocale']['country'] }"
+        "#{ preferred_language(field_name) }_" \
+          "#{ country_abbreviation(field_name) }"
       end
 
-      def localized_field_available? field_name
-        raw_info[field_name] && raw_info[field_name]['localized']
+      def country_abbreviation(field_name = 'firstName')
+        raw_info.dig(*[field_name, 'preferredLocale', 'country'])
+      end
+
+      def preferred_language(field_name = 'firstName')
+        raw_info.dig(*[field_name, 'preferredLocale', 'language'])
       end
 
       def picture_url
